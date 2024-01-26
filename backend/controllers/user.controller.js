@@ -72,14 +72,47 @@ module.exports.deleteUser = async (req,res) => {
     }
 }
 
-module.exports.signup = async (req,res) => {
+//Authentification
+module.exports.auth = async (req,res) => {
     try {
-        const {email} = req.body
-        const userExist = await User.findOne({email})
-        if(userExist){
-            res.status("400").json({success: false, message: "Desolé cet Utilisateur existe !"})
+        const {email,password} = req.body
+        if(!email || !password){
+            return res.status(400).json({
+                success: false,
+                message: "E-mail et Mot de passe sont requis ! "
+            })
         }
+        //check user E-mail exist database
+        const user = await User.findOne({email})
+        if(!user) {
+            return res.status(400).json({
+                success: false,
+                message: "E-mail Invalide !"
+            })
+        }
+
+        //Verify user password calling the function comparePassword since usermodel
+        const isMatched = await user.comparePassword(password)
+        if(!isMatched){
+            return res.status(400).json({
+                success: false,
+                message: "Password Invalide !"
+            })
+        }
+
+        // auth
+         
+        res.status(200).json({
+            success: true,
+            user
+        })
+
+
     } catch (error) {
-        
+       console.log(error);
+       return res.status(400).json({
+        success: false,
+        message: "Cannot log in, check your credential ! "
+       }) 
     }
 }

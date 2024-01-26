@@ -34,6 +34,11 @@ UserModel.pre('save', async function(next){
         next()
     }this.password = await bcrypt.hash(this.password, 10)
 })
+
+// Verify password 
+UserModel.methods.comparePassword = async function(yourPassword){
+    return await bcrypt.compare(yourPassword,this.password)
+}
 const User = mongoose.model("user", UserModel)
 
 module.exports = User
