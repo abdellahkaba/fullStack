@@ -3,6 +3,15 @@ const User = require("../models/user.model")
 
 module.exports.setUsers = async (req,res) => {
 
+    const {email} = req.body
+    const userExist = await User.findOne({email})
+    if(userExist){
+       return res.status("400").json({
+        success: false, 
+        message: "Desolé cet Utilisateur existe !"
+       })
+    }
+    
     try {
         const user = await User.create({
             name: req.body.name,
@@ -58,6 +67,18 @@ module.exports.deleteUser = async (req,res) => {
         }
         await deleteUser.deleteOne()
         res.status(200).json(`Utilisateur ID ${req.params.id} Supprimé`);
+    } catch (error) {
+        
+    }
+}
+
+module.exports.signup = async (req,res) => {
+    try {
+        const {email} = req.body
+        const userExist = await User.findOne({email})
+        if(userExist){
+            res.status("400").json({success: false, message: "Desolé cet Utilisateur existe !"})
+        }
     } catch (error) {
         
     }
